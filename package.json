@@ -1,0 +1,24 @@
+{
+  "name": "firebase-todomvc-starter-code-with-webpack",
+  "version": "1.0.0",
+  "description": "Starter code for Firebase TodoMVC",
+  "scripts": {
+    "webpack": "node ./node_modules/webpack/bin/webpack.js --watch",
+    "server": "node ./node_modules/http-server/bin/http-server -c-1",
+    "start": "npm run webpack & npm run server",
+    "win-start": "node ./npm run webpack & npm run server"
+  },
+  "author": "Saimon Sharif",
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "firebase": "^4.6.2",
+    "google-auth-library": "^0.12.0",
+    "googleapis": "^23.0.0",
+    "http-server": "^0.10.0",
+    "jquery": "^3.2.1",
+    "lodash": "^4.17.4",
+    "webpack": "^3.8.1"
+  }
+}

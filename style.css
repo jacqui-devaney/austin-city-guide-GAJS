@@ -1,0 +1,77 @@
+body {
+  background-color: #FFF8E8;
+  font-family: 'PT Sans', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #EEC584;
+}
+
+ul.nav {
+  list-style-type: none;
+  text-align: center;
+}
+
+li.nav-item {
+  display: inline;
+  font-size: 28px;
+  margin: 10px 30px;
+}
+
+li.nav-item a:hover {
+  color: #C4867F;
+}
+
+#title {
+  color: #C4867F;
+  font-family: 'PT Sans', sans-serif;
+  text-align: center;
+  padding-top: 50px;
+  margin-bottom: 10px;
+  font-size: 75px;
+}
+
+#activity-items {
+  margin: 0 auto;
+}
+
+.activity {
+  background-color: #739E82;
+  width: 23%;
+  height: 30%;
+  opacity: 0.5;
+  float: left;
+  margin: 20px;
+}
+
+.activity-text {
+  text-align: center;
+  padding: 20px;
+  color: #FFF8E8;
+}
+
+.holder {
+  margin: auto;
+  overflow: hidden;
+  position: relative;
+  width: 200px;
+  height: 20px;
+}
+
+.smallLine {
+    position: absolute;
+    width: 200px;
+    height: 5px;
+}
+
+.smallLine1 {
+    background: linear-gradient(45deg, transparent, transparent 49%, red 49%, transparent 51%);
+}
+.smallLine2 {
+    background: linear-gradient(-45deg, transparent, transparent 49%, red 49%, transparent 51%);
+}
+
+.smallLine {
+    background-size: 10px 10px;
+}
