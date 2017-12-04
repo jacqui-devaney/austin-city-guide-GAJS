@@ -89,6 +89,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
   var dataItems;
   var placeData;
+  var allDataArr = [];
 
   function start() {
     // 2. Initialize the JavaScript client library.
@@ -100,7 +101,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     }).then(function () {
       // 3. Initialize and make the API request.
       return gapi.client.request({
-        'path': 'https://sheets.googleapis.com/v4/spreadsheets/1PzP1Yqp5RwqsyH7Jn97CD3AO5EM5TeOll7oZQRGnjhc/values/A1:I43'
+        'path': 'https://sheets.googleapis.com/v4/spreadsheets/1PzP1Yqp5RwqsyH7Jn97CD3AO5EM5TeOll7oZQRGnjhc/values/A1:J43'
       });
     }).then(function (response) {
       dataItems = response.result;
@@ -123,7 +124,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
       });
     },
     getCardMarkup: function getCardMarkup(place) {
-      return '<div class="activity active">\n      <span class="activity-text">\n        <h1 class="activity-title">' + place.Place + '</h1>\n        <h3 class="activity-label">' + place.MealTime + '</h3>\n     </span>\n    </div>';
+      var isImage = place.ImageURL;
+      var activity = place.Activity.toLowerCase();
+      var outdoorSeating = function outdoorSeating() {
+        if (place.OutdoorSeating === 'Yes') {
+          return "There's outdoor seating";
+        } else {
+          return "There's no outdoor seating";
+        }
+      };
+      console.log(isImage);
+      console.log(activity);
+      if (typeof isImage === 'string') {
+        if (activity.includes('eating') || activity.includes('drinking')) {
+          return '<div class="activity ' + place.Activity.toLowerCase() + ' ontouchstart="this.classList.toggle(\'hover\');">\n        <div class="card">\n          <div class="activity-text front">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <h3 class="activity-mealtime">' + place.MealTime + '</h3>\n            <h3 class="activity-type">' + place.Type + '</h3>\n         </div>\n         <div class="activity-text back">\n           <p class="activity-happyhour">Happy Hour Hours:</p>\n           <p class="activity-happyhour">' + place.HappyHourTime + '</p>\n           <p class="activity-outdoor">' + outdoorSeating() + '</p>\n           <p><a href="' + place.URL + '" target="_blank">Visit Website</a></p>\n         </div>\n         <div>\n        </div>';
+        } else {
+          return '<div class="activity ' + place.Activity.toLowerCase() + ' ontouchstart="this.classList.toggle(\'hover\');">\n        <div class="card">\n          <div class="activity-text front">\n            <img class="activity-pic" src="' + place.ImageURL + '">\n            <h1 class="activity-title">' + place.Place + '</h1>\n         </div>\n         <div class="activity-text back">\n          <p> hours </p>\n          <p> map </p>\n         </div>\n         <div>\n        </div>';
+        }
+      } else {
+        if (activity.includes('eating') || activity.includes('drinking')) {
+          return '<div class="activity ' + place.Activity.toLowerCase() + ' ontouchstart="this.classList.toggle(\'hover\');">\n        <div class="card">\n          <div class="activity-text front">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <h3 class="activity-mealtime">' + place.MealTime + '</h3>\n            <h3 class="activity-type">' + place.Type + '</h3>\n         </div>\n         <div class="activity-text back">\n           <p class="activity-happyhour">Happy Hour Hours:</p>\n           <p class="activity-happyhour">' + place.HappyHourTime + '</p>\n           <p class="activity-outdoor">' + outdoorSeating() + '</p>\n           <p><a href="' + place.URL + '" target="_blank">Visit Website</a></p>\n         </div>\n         <div>\n        </div>';
+        } else {
+          return '<div class="activity ' + place.Activity.toLowerCase() + ' ontouchstart="this.classList.toggle(\'hover\');">\n        <div class="card">\n          <div class="activity-text front">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <p>photo will go here</p>\n         </div>\n         <div class="activity-text back">\n          <p> hours </p>\n          <p> map </p>\n         </div>\n         <div>\n        </div>';
+        }
+      }
     }
   };
 
@@ -134,13 +158,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
       this.render();
     },
     bindEvents: function bindEvents() {
-      (0, _jquery2.default)('.nav').on('click', "li", App.toggleView.bind(this));
+      (0, _jquery2.default)('.nav').on('click', "li", this.toggleView.bind(this));
+      (0, _jquery2.default)('#header').on('click', this.showAllItems.bind(this));
+      (0, _jquery2.default)('.activity').on('click', this.cardFlip());
     },
     render: function render() {
       var placesArr = dataItems.values;
       var response = placesArr.forEach(function (element, i) {
         if (i > 0) {
           placeData = _lodash2.default.zipObject(dataItems.values[0], dataItems.values[i]);
+          allDataArr.push(placeData);
           App.renderCards();
         }
       });
@@ -151,11 +178,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
     },
     toggleView: function toggleView(event) {
       var element = event.target;
-      console.log(element.className);
-      // debugger;
-      console.log(this);
-      // console.log(placeData);
-      // console.log($(this).text());
+      var navClass = element.className;
+      (0, _jquery2.default)(".activity").each(function () {
+        var hasClass = (0, _jquery2.default)(this).hasClass(navClass);
+        if (hasClass === false) {
+          (0, _jquery2.default)(this).css('display', 'none');
+        } else (0, _jquery2.default)(this).css('display', 'inline-block');
+      });
+    },
+    showAllItems: function showAllItems() {
+      console.log("clicked");
+      (0, _jquery2.default)(".activity").each(function () {
+        (0, _jquery2.default)(this).css('display', 'inline-block');
+      });
+    },
+    cardFlip: function cardFlip() {
+      console.log("flip");
+      (0, _jquery2.default)('.activity').toggle(function () {
+        (0, _jquery2.default)('.activity .card').addClass('flipped');
+      }, function () {
+        (0, _jquery2.default)('.activity .card').removeClass('flipped');
+      });
     }
   };
 });

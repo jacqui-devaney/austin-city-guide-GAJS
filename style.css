@@ -1,54 +1,149 @@
 body {
-  background-color: #FFF8E8;
-  font-family: 'PT Sans', sans-serif;
+  background-color: white;
+  font-family: 'Oswald', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+
+#title {
+  color: black;
+  font-family: 'Oswald', sans-serif;
+  text-align: left;
+  padding-top: 5px;
+  font-size: 32px;
+  margin-left: 20px;
+  margin-bottom: 40px;
+}
+
+#title a {
+  color: black;
+}
+
+.wrap {
+  width: 100%;
+  overflow: auto;
+  height: 100%;
+  display: block;
+
+}
+
+.header {
+  float:left;
+  width: 20%;
 }
 
 a {
   text-decoration: none;
-  color: #EEC584;
+  color: #000;
 }
 
 ul.nav {
   list-style-type: none;
-  text-align: center;
+  text-align: left;
+  margin: 0;
+  margin-left: 20px;
+  padding: 0;
 }
 
 li.nav-item {
-  display: inline;
-  font-size: 28px;
-  margin: 10px 30px;
+  font-size: 42px;
+  font-family: 'Playfair Display', serif;
+  padding-bottom: 20px;
+
 }
 
 li.nav-item a:hover {
   color: #C4867F;
 }
 
-#title {
-  color: #C4867F;
-  font-family: 'PT Sans', sans-serif;
-  text-align: center;
-  padding-top: 50px;
-  margin-bottom: 10px;
-  font-size: 75px;
-}
-
 #activity-items {
-  margin: 0 auto;
+  width: 80%;
+  margin: 10px auto;
+  position: relative;
+  text-align: center;
+  float: right;
 }
 
 .activity {
-  background-color: #739E82;
-  width: 23%;
-  height: 30%;
-  opacity: 0.5;
-  float: left;
-  margin: 20px;
+  height: 400px;
+  text-align: center;
+  background-color: #FFCFB7;
+  width: 350px;
+  margin-top: 24px;
+  margin-right: 24px;
+  display: inline-block;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: all 0.2s ease-in-out
+}
+
+.activity:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  /*background-color: #C8AD55;*/
+  transform: scale(1.02);
+}
+
+.activity-pic {
+  width:320px;
+  height:215px;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.activity-title {
+  position: relative;
+}
+
+.hide {
+  display: none
+}
+
+/* entire container, keeps perspective */
+.activity {
+	perspective: 1000px;
+}
+	/* flip the pane when hovered */
+	.activity:hover .card, .activity.hover .card {
+		transform: rotateY(180deg);
+	}
+
+.activity, .front, .back {
+	width: 320px;
+	height: 350px;
+}
+
+/* flip speed goes here */
+.card {
+	transition: 0.6s;
+	transform-style: preserve-3d;
+	position: relative;
+}
+
+/* hide back of pane during swap */
+.front, .back {
+	backface-visibility: hidden;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+/* front pane, placed above back */
+.front {
+	z-index: 2;
+	/* for firefox 31 */
+	transform: rotateY(0deg);
+}
+
+/* back, initially hidden pane */
+.back {
+	transform: rotateY(180deg);
 }
 
 .activity-text {
   text-align: center;
-  padding: 20px;
   color: #FFF8E8;
+  width: 100%;
 }
 
 .holder {
@@ -74,4 +169,76 @@ li.nav-item a:hover {
 
 .smallLine {
     background-size: 10px 10px;
+}
+
+
+@media only screen
+  and (min-device-width: 414px)
+  and (max-device-width: 736px)
+  and (-webkit-min-device-pixel-ratio: 3) {
+
+    .header {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      overflow: hidden;
+      background-color: white;
+      z-index:200;
+      text-align: center;
+    }
+
+    #title {
+      color: black;
+      font-family: 'Oswald', sans-serif;
+      text-align: center;
+      padding-top: 5px;
+      font-size: 55px;
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    .nav-for-media {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    ul.nav {
+      list-style-type: none;
+      text-align: center;
+      width: 100%;
+    }
+
+    li.nav-item {
+      font-size: 24px;
+      font-family: 'Playfair Display', serif;
+      padding: 20px;
+      display: inline;
+      text-align: center;
+    }
+
+    #activity-items {
+      width: 100%;
+      margin-top: 220px;
+      z-index:100;
+    }
+
+    .activity {
+      height: 700px;
+      text-align: center;
+      background-color: #FFCFB7;
+      width: 600px;
+      margin-top: 24px;
+      margin-right: 24px;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+      transition: all 0.2s ease-in-out
+    }
+
+    .activity-pic {
+      width:600px;
+      height:500px;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
 }
