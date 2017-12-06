@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import _ from 'lodash';
+import Shuffle from 'shufflejs';
 
+console.log(Shuffle);
 
 // var fs = require('fs');
 // var readline = require('readline');
@@ -23,12 +25,11 @@ function start() {
     }).then(function() {
       // 3. Initialize and make the API request.
       return gapi.client.request({
-        'path': 'https://sheets.googleapis.com/v4/spreadsheets/1PzP1Yqp5RwqsyH7Jn97CD3AO5EM5TeOll7oZQRGnjhc/values/A1:J43',
+        'path': 'https://sheets.googleapis.com/v4/spreadsheets/1PzP1Yqp5RwqsyH7Jn97CD3AO5EM5TeOll7oZQRGnjhc/values/A1:K43',
       })
     }).then(function(response) {
       dataItems = response.result;
       var items = response.result;
-      console.log(items);
       App.init();
     }, function(reason) {
       console.log('Error: ' + reason.result.error.message);
@@ -41,13 +42,20 @@ var Utils = {
   getAllCardsMarkup: function(places) {
     return $.each(places, function() {
         var markup = Utils.getCardMarkup(places);
-        console.log(markup);
         return markup;
     });
   },
   getCardMarkup: function(place) {
     var isImage = place.ImageURL;
     var activity = place.Activity.toLowerCase();
+    var activityData = function() {
+      var activityNumber = activity.split(" ").join('", "');
+      if (activityNumber < 2) {
+        return activity;
+      } else {
+        return activityNumber;
+      }
+    };
     var outdoorSeating = function() {
       if(place.OutdoorSeating === 'Yes') {
         return "There's outdoor seating";
@@ -55,13 +63,12 @@ var Utils = {
         return "There's no outdoor seating";
       }
     };
-    console.log(isImage);
-    console.log(activity);
     if (typeof isImage === 'string') {
       if(activity.includes('eating') || activity.includes('drinking')) {
-        return `<div class="activity ${place.Activity.toLowerCase()} ontouchstart="this.classList.toggle('hover');">
+        return `<div class="activity picture-item ${place.Activity.toLowerCase()}" ontouchstart="this.classList.toggle('hover');" data-groups='["${activityData()}"]'>
         <div class="card">
           <div class="activity-text front">
+            <img class="activity-pic" src="${place.ImageURL}">
             <h1 class="activity-title">${place.Place}</h1>
             <h3 class="activity-mealtime">${place.MealTime}</h3>
             <h3 class="activity-type">${place.Type}</h3>
@@ -75,14 +82,16 @@ var Utils = {
          <div>
         </div>`
       } else {
-        return `<div class="activity ${place.Activity.toLowerCase()} ontouchstart="this.classList.toggle('hover');">
+        return `<div class="activity picture-item ${place.Activity.toLowerCase()}" ontouchstart="this.classList.toggle('hover');" data-groups='["${activityData()}"]'>
         <div class="card">
           <div class="activity-text front">
             <img class="activity-pic" src="${place.ImageURL}">
             <h1 class="activity-title">${place.Place}</h1>
+            <div class="color-block"></div>
          </div>
          <div class="activity-text back">
-          <p> hours </p>
+          <p> Hours of Operation </p>
+          <p class="activity-hours">${place.HappyHourTime}</p>
           <p> map </p>
          </div>
          <div>
@@ -90,7 +99,8 @@ var Utils = {
       }
     } else {
       if(activity.includes('eating') || activity.includes('drinking')) {
-        return `<div class="activity ${place.Activity.toLowerCase()} ontouchstart="this.classList.toggle('hover');">
+        console.log(isImage);
+        return `<div class="activity picture-item ${place.Activity.toLowerCase()}" ontouchstart="this.classList.toggle('hover');" data-groups='["${activityData()}"]'>
         <div class="card">
           <div class="activity-text front">
             <h1 class="activity-title">${place.Place}</h1>
@@ -106,7 +116,7 @@ var Utils = {
          <div>
         </div>`
       } else {
-        return `<div class="activity ${place.Activity.toLowerCase()} ontouchstart="this.classList.toggle('hover');">
+        return `<div class="activity picture-item ${place.Activity.toLowerCase()}" ontouchstart="this.classList.toggle('hover');" data-groups='["${activityData()}"]'>
         <div class="card">
           <div class="activity-text front">
             <h1 class="activity-title">${place.Place}</h1>
@@ -121,7 +131,7 @@ var Utils = {
       }
     }
   }
-}
+};
 
 var App = {
   init: function() {
@@ -130,8 +140,8 @@ var App = {
     this.render();
   },
   bindEvents: function() {
-    $('.nav').on('click', "li", this.toggleView.bind(this));
-    $('#header').on('click', this.showAllItems.bind(this));
+    $('.nav').on('click', "li", this.cardShuffle.bind(this));
+    $('#header').on('click', this.cardShuffleAll.bind(this));
     $('.activity').on('click', this.cardFlip());
   },
   render: function() {
@@ -143,12 +153,21 @@ var App = {
         App.renderCards();
       }
     });
+
+    var element = document.querySelector('#activity-items');
+    var sizer = element.querySelector('.my-sizer-element');
+    App.shuffleInstance = new Shuffle(element, {
+      itemSelector: '.activity',
+      sizer: sizer
+    });
+    console.log(App.shuffleInstance);
   },
   renderCards: function() {
     const cardsMarkup = Utils.getCardMarkup(placeData);
     $("#activity-items").append(cardsMarkup);
   },
   toggleView: function(event) {
+    //replaced this with the cardShuffle function below
     var element = event.target;
     var navClass = element.className;
     $(".activity").each(function() {
@@ -160,19 +179,33 @@ var App = {
     })
   },
   showAllItems: function() {
-    console.log("clicked");
     $(".activity").each(function() {
       $(this).css('display', 'inline-block');
     })
   },
   cardFlip: function() {
-    console.log("flip");
     $('.activity').toggle(
       function() {
           $('.activity .card').addClass('flipped');
       },
       function() { $('.activity .card').removeClass('flipped');
     })
+  },
+  cardShuffle: function(event) {
+    var element = event.currentTarget;
+    var navClass = $(element).find("a")[0].className;
+    // var navClass = element.className;
+    App.shuffleInstance.filter(navClass);
+  },
+  cardShuffleAll: function() {
+    // var element = document.querySelector('#activity-items');
+    // var sizer = element.querySelector('#activity-items');
+    // // TODO: Change this later
+    // var shuffleInstance = new Shuffle(element, {
+    //   itemSelector: '.activity',
+    //   sizer: sizer
+    // });
+    App.shuffleInstance.filter(Shuffle.ALL_ITEMS);
   }
 };
 
