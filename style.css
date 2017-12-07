@@ -181,6 +181,27 @@ li.nav-item a:hover {
   margin-left: 20px;
 }
 
+.activity-happyhourtext {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-decoration: underline;
+}
+
+.activity-happyhour {
+  margin-top: 0px;
+}
+
+.activity-outdoor {
+  padding-top: 130px;
+}
+
+.activity-text a {
+  bottom: 10;
+  text-align: center;
+  font-size: 18px;
+  color: #d28c0e;
+}
+
 .activity-mealtime {
   font-size: 14px;
   margin-top: 0px;
@@ -191,6 +212,10 @@ li.nav-item a:hover {
   font-size: 12px;
   margin-top: 0px;
   margin-bottom: 0px;
+}
+
+#map {
+  height: 100%;
 }
 
 .holder {

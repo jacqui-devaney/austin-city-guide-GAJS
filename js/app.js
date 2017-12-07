@@ -2,18 +2,29 @@ import $ from 'jquery';
 import _ from 'lodash';
 import Shuffle from 'shufflejs';
 
-console.log(Shuffle);
 
 // var fs = require('fs');
 // var readline = require('readline');
 // var google = require('googleapis');
 // var googleAuth = require('google-auth-library');
 
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyB8nv6nE2e9iD6JurhpjeeYZxuC9Fz26Fk",
+  authDomain: "austin-city-guide.firebaseapp.com",
+  databaseURL: "https://austin-city-guide.firebaseio.com",
+  projectId: "austin-city-guide",
+  storageBucket: "austin-city-guide.appspot.com",
+  messagingSenderId: "717637854232"
+};
+firebase.initializeApp(config);
+
 $(document).ready(function(){
 
 var dataItems;
 var placeData;
 var allDataArr = [];
+var mapLocation = [];
 
 function start() {
     // 2. Initialize the JavaScript client library.
@@ -63,6 +74,15 @@ var Utils = {
         return "There's no outdoor seating";
       }
     };
+    var renderMap = function() {
+      var mapCords = place.Cords.split(",");
+      var mapObj = {
+        place: place.Place,
+        long: mapCords[0],
+        lat: mapCords[1]
+      };
+      mapLocation.push(mapObj);
+    };
     if (typeof isImage === 'string') {
       if(activity.includes('eating') || activity.includes('drinking')) {
         return `<div class="activity picture-item ${place.Activity.toLowerCase()}" ontouchstart="this.classList.toggle('hover');" data-groups='["${activityData()}"]'>
@@ -74,7 +94,7 @@ var Utils = {
             <h3 class="activity-type">${place.Type}</h3>
          </div>
          <div class="activity-text back">
-           <p class="activity-happyhour">Happy Hour Hours:</p>
+           <p class="activity-happyhourtext">Happy Hour Hours:</p>
            <p class="activity-happyhour">${place.HappyHourTime}</p>
            <p class="activity-outdoor">${outdoorSeating()}</p>
            <p><a href="${place.URL}" target="_blank">Visit Website</a></p>
@@ -87,19 +107,19 @@ var Utils = {
           <div class="activity-text front">
             <img class="activity-pic" src="${place.ImageURL}">
             <h1 class="activity-title">${place.Place}</h1>
-            <div class="color-block"></div>
+
          </div>
          <div class="activity-text back">
-          <p> Hours of Operation </p>
+          <p class="activity-happyhourtext"> Hours of Operation </p>
           <p class="activity-hours">${place.HappyHourTime}</p>
-          <p> map </p>
+          <div id="map" class="${place.Place}"></div>
+
          </div>
          <div>
         </div>`
       }
     } else {
       if(activity.includes('eating') || activity.includes('drinking')) {
-        console.log(isImage);
         return `<div class="activity picture-item ${place.Activity.toLowerCase()}" ontouchstart="this.classList.toggle('hover');" data-groups='["${activityData()}"]'>
         <div class="card">
           <div class="activity-text front">
@@ -160,11 +180,12 @@ var App = {
       itemSelector: '.activity',
       sizer: sizer
     });
-    console.log(App.shuffleInstance);
   },
   renderCards: function() {
     const cardsMarkup = Utils.getCardMarkup(placeData);
-    $("#activity-items").append(cardsMarkup);
+    $("#activity-items").append(cardsMarkup).done( function() {
+          App.renderMap();
+    });
   },
   toggleView: function(event) {
     //replaced this with the cardShuffle function below
@@ -206,6 +227,16 @@ var App = {
     //   sizer: sizer
     // });
     App.shuffleInstance.filter(Shuffle.ALL_ITEMS);
+  },
+  renderMap: function() {
+    var placeName = $(".activity-title");
+    var map;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: -34.397, lng: 150.644},
+        zoom: 8
+      });
+    }
   }
 };
 

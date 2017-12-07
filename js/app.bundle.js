@@ -84,18 +84,28 @@ var _shufflejs2 = _interopRequireDefault(_shufflejs);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-console.log(_shufflejs2.default);
-
 // var fs = require('fs');
 // var readline = require('readline');
 // var google = require('googleapis');
 // var googleAuth = require('google-auth-library');
+
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyB8nv6nE2e9iD6JurhpjeeYZxuC9Fz26Fk",
+  authDomain: "austin-city-guide.firebaseapp.com",
+  databaseURL: "https://austin-city-guide.firebaseio.com",
+  projectId: "austin-city-guide",
+  storageBucket: "austin-city-guide.appspot.com",
+  messagingSenderId: "717637854232"
+};
+firebase.initializeApp(config);
 
 (0, _jquery2.default)(document).ready(function () {
 
   var dataItems;
   var placeData;
   var allDataArr = [];
+  var mapLocation = [];
 
   function start() {
     // 2. Initialize the JavaScript client library.
@@ -145,15 +155,23 @@ console.log(_shufflejs2.default);
           return "There's no outdoor seating";
         }
       };
+      var renderMap = function renderMap() {
+        var mapCords = place.Cords.split(",");
+        var mapObj = {
+          place: place.Place,
+          long: mapCords[0],
+          lat: mapCords[1]
+        };
+        mapLocation.push(mapObj);
+      };
       if (typeof isImage === 'string') {
         if (activity.includes('eating') || activity.includes('drinking')) {
-          return '<div class="activity picture-item ' + place.Activity.toLowerCase() + '" ontouchstart="this.classList.toggle(\'hover\');" data-groups=\'["' + activityData() + '"]\'>\n        <div class="card">\n          <div class="activity-text front">\n            <img class="activity-pic" src="' + place.ImageURL + '">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <h3 class="activity-mealtime">' + place.MealTime + '</h3>\n            <h3 class="activity-type">' + place.Type + '</h3>\n         </div>\n         <div class="activity-text back">\n           <p class="activity-happyhour">Happy Hour Hours:</p>\n           <p class="activity-happyhour">' + place.HappyHourTime + '</p>\n           <p class="activity-outdoor">' + outdoorSeating() + '</p>\n           <p><a href="' + place.URL + '" target="_blank">Visit Website</a></p>\n         </div>\n         <div>\n        </div>';
+          return '<div class="activity picture-item ' + place.Activity.toLowerCase() + '" ontouchstart="this.classList.toggle(\'hover\');" data-groups=\'["' + activityData() + '"]\'>\n        <div class="card">\n          <div class="activity-text front">\n            <img class="activity-pic" src="' + place.ImageURL + '">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <h3 class="activity-mealtime">' + place.MealTime + '</h3>\n            <h3 class="activity-type">' + place.Type + '</h3>\n         </div>\n         <div class="activity-text back">\n           <p class="activity-happyhourtext">Happy Hour Hours:</p>\n           <p class="activity-happyhour">' + place.HappyHourTime + '</p>\n           <p class="activity-outdoor">' + outdoorSeating() + '</p>\n           <p><a href="' + place.URL + '" target="_blank">Visit Website</a></p>\n         </div>\n         <div>\n        </div>';
         } else {
-          return '<div class="activity picture-item ' + place.Activity.toLowerCase() + '" ontouchstart="this.classList.toggle(\'hover\');" data-groups=\'["' + activityData() + '"]\'>\n        <div class="card">\n          <div class="activity-text front">\n            <img class="activity-pic" src="' + place.ImageURL + '">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <div class="color-block"></div>\n         </div>\n         <div class="activity-text back">\n          <p> Hours of Operation </p>\n          <p class="activity-hours">' + place.HappyHourTime + '</p>\n          <p> map </p>\n         </div>\n         <div>\n        </div>';
+          return '<div class="activity picture-item ' + place.Activity.toLowerCase() + '" ontouchstart="this.classList.toggle(\'hover\');" data-groups=\'["' + activityData() + '"]\'>\n        <div class="card">\n          <div class="activity-text front">\n            <img class="activity-pic" src="' + place.ImageURL + '">\n            <h1 class="activity-title">' + place.Place + '</h1>\n\n         </div>\n         <div class="activity-text back">\n          <p class="activity-happyhourtext"> Hours of Operation </p>\n          <p class="activity-hours">' + place.HappyHourTime + '</p>\n          <div id="map" class="' + place.Place + '"></div>\n\n         </div>\n         <div>\n        </div>';
         }
       } else {
         if (activity.includes('eating') || activity.includes('drinking')) {
-          console.log(isImage);
           return '<div class="activity picture-item ' + place.Activity.toLowerCase() + '" ontouchstart="this.classList.toggle(\'hover\');" data-groups=\'["' + activityData() + '"]\'>\n        <div class="card">\n          <div class="activity-text front">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <h3 class="activity-mealtime">' + place.MealTime + '</h3>\n            <h3 class="activity-type">' + place.Type + '</h3>\n         </div>\n         <div class="activity-text back">\n           <p class="activity-happyhour">Happy Hour Hours:</p>\n           <p class="activity-happyhour">' + place.HappyHourTime + '</p>\n           <p class="activity-outdoor">' + outdoorSeating() + '</p>\n           <p><a href="' + place.URL + '" target="_blank">Visit Website</a></p>\n         </div>\n         <div>\n        </div>';
         } else {
           return '<div class="activity picture-item ' + place.Activity.toLowerCase() + '" ontouchstart="this.classList.toggle(\'hover\');" data-groups=\'["' + activityData() + '"]\'>\n        <div class="card">\n          <div class="activity-text front">\n            <h1 class="activity-title">' + place.Place + '</h1>\n            <p>photo will go here</p>\n         </div>\n         <div class="activity-text back">\n          <p> hours </p>\n          <p> map </p>\n         </div>\n         <div>\n        </div>';
@@ -189,11 +207,12 @@ console.log(_shufflejs2.default);
         itemSelector: '.activity',
         sizer: sizer
       });
-      console.log(App.shuffleInstance);
     },
     renderCards: function renderCards() {
       var cardsMarkup = Utils.getCardMarkup(placeData);
-      (0, _jquery2.default)("#activity-items").append(cardsMarkup);
+      (0, _jquery2.default)("#activity-items").append(cardsMarkup).done(function () {
+        App.renderMap();
+      });
     },
     toggleView: function toggleView(event) {
       //replaced this with the cardShuffle function below
@@ -233,6 +252,16 @@ console.log(_shufflejs2.default);
       //   sizer: sizer
       // });
       App.shuffleInstance.filter(_shufflejs2.default.ALL_ITEMS);
+    },
+    renderMap: function renderMap() {
+      var placeName = (0, _jquery2.default)(".activity-title");
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: -34.397, lng: 150.644 },
+          zoom: 8
+        });
+      }
     }
   };
 });
